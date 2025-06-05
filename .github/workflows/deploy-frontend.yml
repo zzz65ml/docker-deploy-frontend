@@ -1,7 +1,7 @@
 name: Deploy frontend application
 on:
   push:
-    branches: [main]
+    branches: [main, feature/new-ui]
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -29,17 +29,22 @@ jobs:
           tags: 20232089/234-deploylab-frontend:latest
 
       - name: Copy docker-compose.yml via SSH
+        if: github.ref == 'refs/heads/feature/new-ui'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.HOST_SERVER }}
           username: ${{ secrets.HOST_USER_NAME }}
           key: ${{ secrets.HOST_SSH_PRIVATE_KEY }}
           port: 22
-          source: "docker-compose.yml"
-          target: "/home/ubuntu/frontend"
+          source: "docker-compose-prod.yml"
+          target: "/home/ubuntu/frontend-prod"
           time: 300
 
+
+
       - name: Run docker-compose on remote server
+        if: github.ref == 'refs/heads/feature/new-ui'
+
         uses: appleboy/ssh-action@v1.2.1
         with:
           host: ${{ secrets.HOST_SERVER }}
@@ -47,9 +52,10 @@ jobs:
           key: ${{ secrets.HOST_SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /home/ubuntu/frontend
+            cd /home/ubuntu/frontend-prod
             echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
             docker compose down
             docker compose pull
             docker compose up -d
+            docker compose -f docker-compose-prod.yml up -d
             rm -rf /home/ubuntu/frontend
