@@ -2,6 +2,7 @@ version: '3.3'
 services:
   frontend:
     image: 20232089/234-deploylab-frontend:latest
+    # noinspection ComposeUnknownKeys
     pull_policy: always
     ports:
       - "8086:80"

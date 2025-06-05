@@ -37,6 +37,7 @@ jobs:
           port: 22
           source: "docker-compose.yml"
           target: "/home/ubuntu/frontend"
+          time: 300
 
       - name: Run docker-compose on remote server
         uses: appleboy/ssh-action@v1.2.1
