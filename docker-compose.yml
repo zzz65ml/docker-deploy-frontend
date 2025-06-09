@@ -2,7 +2,12 @@ version: '3.3'
 services:
   frontend:
     image: 20232089/234-deploylab-frontend:latest
-    # noinspection ComposeUnknownKeys
     pull_policy: always
     ports:
       - "8086:80"
+    # 新增健康检查：确保Nginx启动成功
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]  # 检查首页是否可访问
+      interval: 10s
+      timeout: 5s
+      retries: 3
